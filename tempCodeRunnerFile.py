@@ -271,18 +271,15 @@ def paises_continentes():
 
     #Recorro la lista global de paises
     for pais in paises:
-        #Almaceno en una variable los nombres de los continentes
         nombre_continente = pais["continente"]
         
-        #Si ya esta dentro del diccionario conteo, le suma 1
         if nombre_continente in conteo:
             conteo[nombre_continente] += 1
         else:
-            #Si no esta en el diccionario, lo inicializa con 1
             conteo[nombre_continente] = 1
             
+    # # Si necesitas retornar el set y la lista por separado como tenías pensado:
     
-    #Los devuelvo en forma de lista para despues poder mostrarlos por pantalla con un for
     continentes_unicos = list(conteo.keys())
     cantidades = list(conteo.values())
     
