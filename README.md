@@ -3,7 +3,10 @@ Trabajo Practico Integrador Gonzalo Serpino
 
 # Gestor de Países en Python 🌎
 
+
 Este es un programa simple de consola (terminal) que permite gestionar una lista de países, guardando la información de forma automática en un archivo CSV (`paises.csv`).
+
+Link del video explicativo: https://drive.google.com/file/d/1vMd_5CmmAmM3Uxe-4_LrTzoCg1YUZaMU/view
 
 ## 🚀 Cómo ejecutar el programa
 
