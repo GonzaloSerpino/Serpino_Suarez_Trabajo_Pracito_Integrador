@@ -1,5 +1,4 @@
 import csv
-import os
 import re
 
 NOMBRE_ARCHIVO = "paises.csv"
