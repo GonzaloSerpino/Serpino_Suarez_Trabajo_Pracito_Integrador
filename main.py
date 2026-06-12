@@ -1,9 +1,7 @@
 import csv
-import os
 import re
 
 NOMBRE_ARCHIVO = "paises.csv"
-archivo_existe = os.path.exists(NOMBRE_ARCHIVO)
 CAMPOS = ["nombre", "poblacion", "superficie", "continente"]
 
 def obtener_paises(archivo):
@@ -32,17 +30,6 @@ def obtener_paises(archivo):
         print("El archivo de paises no existe. Por favor primero agregar paises al archivo para que se cree.")
     except Exception as e:
         print(f"Ha ocurrido el siguiente error: {e}")
-
-def añadir_pais(archivo, pais):
-    """Añado el pais indicado a la lista"""
-    try:
-        with open(archivo, "a", newline="",encoding="utf-8") as archivo:
-            escritor = csv.DictWriter(archivo, fieldnames=CAMPOS)
-            if not archivo_existe:
-                escritor.writeheader()
-            escritor.writerow(pais)
-    except PermissionError:
-        print("Error: No se puede acceder al archivo, este podria estar siendo utilizado por otro programa.")
 
         
 def actualizar_archivo(archivo,lista_pais, columnas):
@@ -230,10 +217,10 @@ def busqueda():
 
         #Me guardo el input del continente a buscar
         elif opcion == 4:
-            valor_busqueda = input("Ingrese el valor del continente a buscar: ")
+            valor_busqueda = input("Ingrese el valor del continente a buscar: ").title()
             while not validar_inputs(valor_busqueda):
                 print("Valor de continente invalido, por favor ingrese un valor correcto.")
-                valor_busqueda = input("Ingrese el valor del continente a buscar: ")
+                valor_busqueda = input("Ingrese el valor del continente a buscar: ").title()
               
         else:
             print("Valor de opcion incorrecta, intente nuevamente")
@@ -251,13 +238,21 @@ def busqueda():
     except Exception as e:
         print(f"Se produjo el siguiente error: {e}")
     
-def promedio_superficie():
+def promedios(opcion):
+    """Devuelve el promedio de la poblacion o superficie entre paises."""
     global paises
     acu = 0
     count = 0
-    for pais in paises:
-        acu += pais["superficie"]
-        count += 1
+    
+    #Si la opcion es 1, busca el promedio de la superficie, si es 2 busca el promedio de la poblacion
+    if opcion == 1:
+        for pais in paises:
+            acu += pais["superficie"]
+            count += 1
+    elif opcion == 2:
+        for pais in paises:
+            acu += pais["poblacion"]
+            count += 1
     
     promedio = float(acu / count)
     
@@ -287,18 +282,163 @@ def paises_continentes():
     cantidades = list(conteo.values())
     
     return continentes_unicos, cantidades
+
+def paises_max_min():
+    global paises
+    
+    max = 0
+    nombre_max = ""
+    min = 999999999
+    nombre_min = ""
     
     
-paises = obtener_paises(NOMBRE_ARCHIVO)
-#actualizar_pais()
-#busqueda()
+    #Hago los for por separado para que no se pisen en la primera iteracion
+    
+    #Recorro la lista de paises en busqueda del pais con mayor poblacion
+    for pais in paises: 
+        if pais["poblacion"] > max:
+            max = pais["poblacion"]
+            nombre_max = pais["nombre"]
+            
+    #Recorro la lista de paises en busqueda del pais con menor poblacion
+    for pais in paises:
+        if pais["poblacion"] < min:
+            min = pais["poblacion"]
+            nombre_min = pais["nombre"]
+       
+    #devuelvo los resultados     
+    return nombre_max, nombre_min
 
-promedio = promedio_superficie()
-print(f"El promedio de la superficie entre los paises es de: {promedio}")
+    
+            
+def estadisticas():
+    """Submenu de estadisticas"""
+    try:
+        global paises
+        print("------------ Estadisticas ------------")
+        print(f"Que estadistica desea consultar?")
+        print("1. Pais con mayor y Pais con menor poblacion\n2. Promedio de poblacion entre paises\n3. Promedio de superficie entre paises\n4. Cantidad de paises por continente")
+        opcion = int(input("Seleccione una opcion: "))
+    
+        if opcion == 1:
+            pais_max, pais_min = paises_max_min()
+            print(f"El pais con mayor poblacion es: {pais_max}")
+            print(f"El pais con menor poblacion es: {pais_min}")
+                
+        elif opcion == 2:
+            pobl_promedio = promedios(2)
+            print(f"El promedio de la superficie entre paises es de: {pobl_promedio}")
+            
 
-continentes, cantidad = paises_continentes()
-for i in range(len(continentes)):
-    print(f"Continente: {continentes[i]} | Cantidad de paises: {cantidad[i]}")
-#paises[0]["nombre"] = "Brasil"
-#print(paises[0]["nombre"])
-#actualizar_archivo(NOMBRE_ARCHIVO, paises, CAMPOS)
+        elif opcion == 3:
+            sup_promedio = promedios(1)
+            print(f"El promedio de la superficie entre paises es de: {sup_promedio} kms")
+            
+
+
+        elif opcion == 4:
+            keys_continente, cant_paises = paises_continentes()
+            for i in range(len(cant_paises)):
+                print(f"Continente: {keys_continente[i]} | Cantidad Paises: {cant_paises[i]}")
+              
+        else:
+            print("Valor de opcion incorrecta, intente nuevamente")
+        
+    except ValueError:
+        print("Valor de opcion incorrecto, por favor intenta nuevamente.")
+    except Exception as e:
+        print(f"Se produjo el siguiente error: {e}")
+    
+
+def alta_pais():
+    global paises
+    
+    nombre_nuevo = input("Ingrese el nombre del pais a ingresar: ").title()
+    
+    while not validar_inputs(nombre_nuevo) or buscar_pais(nombre_nuevo,1)[0]:
+        print("Valor de nombre ingresado invalido o duplicado, por favor ingrese un valor valido")
+        nombre_nuevo = input("Ingrese el nombre del pais a ingresar: ").title()
+    
+    poblacion = input(f"Ingrese la poblacion del pais {nombre_nuevo}: ")
+    
+    while not validar_inputs(poblacion,1) or int(poblacion) <= 0:
+        print("Valor de poblacion incorrecto, por favor ingrese un numero entero positivo mayor a 3 digitos.")
+        poblacion = input(f"Ingrese la poblacion del pais {nombre_nuevo}: ")
+        
+    superficie = input(f"Ingrese la superficie del pais {nombre_nuevo}: ")
+    
+    while not validar_inputs(superficie,1) or int(superficie) <= 0:
+        print("Valor de poblacion incorrecto, por favor ingrese un numero entero positivo mayor a 3 digitos.")
+        superficie = input(f"Ingrese la superficie del pais {nombre_nuevo}: ")
+        
+    continente = input(f"Ingrese el continente del pais {nombre_nuevo}: ").title()
+    
+    while not validar_inputs(continente):
+        print("Valor de nombre ingresado invalido, por favor ingrese un valor valido")
+        continente = input(f"Ingrese el continente del pais {nombre_nuevo}: ").title()
+        
+    poblacion, superficie = int(poblacion), int(superficie)
+    
+    mi_dict = {
+        "nombre": nombre_nuevo,
+        "poblacion": poblacion,
+        "superficie": superficie,
+        "continente": continente
+    }
+    
+    paises.append(mi_dict)
+    
+    actualizar_archivo(NOMBRE_ARCHIVO, paises, CAMPOS)
+    
+    
+        
+
+
+while True:
+    paises = obtener_paises(NOMBRE_ARCHIVO)
+    try:
+        #Muestro por pantalla las opciones del menu
+        print("1) Agregar pais a la lista \n2) Actualizar info de pais \n3) Informacion de paises \n4) Estadisticas \n5) Salir")
+        
+        #Le pido al usuario que ingrese la opcion deseada y lo parseo como
+        opcion = int(input("Ingrese la opcion deseada: "))
+            
+        
+        if opcion == 1:
+            alta_pais()
+        
+        elif opcion == 2:
+            #Si el inventario no esta vacio, ejecuto la funcion. Si lo esta, le indico al usuario que use la opcion 1.
+            if len(paises) > 0:
+                print()
+                actualizar_pais()
+                print()
+            else:
+                print("La lista de paises esta vacia, debe usar la opcion 1 para agregar un pais.")
+        
+        elif opcion == 3:
+            if len(paises) > 0:
+                print()
+                busqueda()
+                print()
+            else:
+                print("La lista de paises esta vacia, debe usar la opcion 1 para agregar un pais.")
+
+
+        elif opcion == 4:
+            if len(paises) > 0:
+                print()
+                estadisticas()
+                print()
+            else:
+                print("La lista de paises esta vacia, debe usar la opcion 1 para agregar un pais.")
+            
+        elif opcion == 5:
+            break
+        
+        #Si el usuario pone una opcion menor o igual a 0 o mayor a 7, levanta un ValueError
+        elif opcion <= 0 or opcion > 5:
+            raise ValueError
+        
+    except ValueError:
+        print(f"Por favor ingrese una opcion valida entre 1 y 7.")
