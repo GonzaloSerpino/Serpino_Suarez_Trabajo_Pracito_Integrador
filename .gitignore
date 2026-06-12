@@ -1,0 +1,6 @@
+# Archivos temporales de VS Code (Code Runner)
+tempCodeRunnerFile.py
+
+# Caché de Python (buenas prácticas)
+__pycache__/
+*.pyc

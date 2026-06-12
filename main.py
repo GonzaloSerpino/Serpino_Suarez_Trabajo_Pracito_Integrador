@@ -441,4 +441,4 @@ while True:
             raise ValueError
         
     except ValueError:
-        print(f"Por favor ingrese una opcion valida entre 1 y 7.")
+        print(f"Por favor ingrese una opcion valida entre 1 y 5.")
